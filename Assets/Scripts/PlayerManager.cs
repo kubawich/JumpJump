@@ -103,8 +103,11 @@ public class PlayerManager : MonoBehaviour
         if (Hits == 2 || this.gameObject.transform.position.y <= -4.5f || col.gameObject.tag == "Enemy")
         {
             //Gamepley stuff
-            this.gameObject.SetActive(false);
+            gameObject.transform.position = new Vector3(0.0f, -4.3f, 0.0f);
             cam.gameObject.transform.parent = null;
+            cam.gameObject.SetActive(true);
+            gameObject.SetActive(false);
+            cam.transform.position = new Vector2(0f, 0f);
             CloudsDestroyer();
             //Saving stuff
             Points = CurrentPoints + PlayerPrefs.GetInt("All points");
