@@ -131,6 +131,7 @@ public class PlayerManager : MonoBehaviour
         else Start();
     }
 
+    //Checks if player's fallin'
     public bool IsFalling()
     {
         if (transform.position.y < currentY && transform.position.y > 0)
@@ -155,7 +156,12 @@ public class PlayerManager : MonoBehaviour
             Points = CurrentPoints + PlayerPrefs.GetInt("All points");
             PlayerPrefs.SetInt("All points", Points);
             DiedByFall = true;
-            ShowAd();
+
+            int range = Random.Range(0, 2);
+            Debug.Log(range);
+            if (range == 1)
+                ShowAd();
+
             NextPlay();
         }
     }
