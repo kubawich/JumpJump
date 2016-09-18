@@ -49,6 +49,7 @@ public class PlayerManager : MonoBehaviour
     //Initialize after each another rebirth
     void NextPlay()
     {
+        cam.backgroundColor = Random.ColorHSV();
         StartButton.gameObject.SetActive(true);
         ShopButton.gameObject.SetActive(true);
         Logo.gameObject.SetActive(true);
@@ -110,7 +111,6 @@ public class PlayerManager : MonoBehaviour
             PlayerPrefs.SetInt("All points", Points);
             //UI stuff
             CurrentPointsText.canvasRenderer.gameObject.SetActive(false);
-            ShowAd();
             NextPlay();
         }
     }
@@ -124,7 +124,7 @@ public class PlayerManager : MonoBehaviour
     //Ads manager
     void ShowAd()
     {
-        if (Advertisement.IsReady())
+        if (Advertisement.IsReady() )
         {
             Advertisement.Show();
         }
@@ -147,9 +147,15 @@ public class PlayerManager : MonoBehaviour
             yield return new WaitForSeconds(1.5f);
             CloudsDestroyer();
             Debug.Log("Died by fall");
-            gameObject.transform.position = new Vector3(0.0f,-4.6f,0.0f);
+            cam.gameObject.transform.parent = null;
+            cam.transform.position = new Vector2(0f, 0f);
+            this.gameObject.SetActive(false);
+            gameObject.transform.position = new Vector3(0.0f,-4.3f,0.0f);
+            CloudsGenerator.transform.position = new Vector2(0f, 2f);
             Points = CurrentPoints + PlayerPrefs.GetInt("All points");
             PlayerPrefs.SetInt("All points", Points);
+            DiedByFall = true;
+            ShowAd();
             NextPlay();
         }
     }

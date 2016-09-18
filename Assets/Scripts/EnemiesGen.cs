@@ -1,30 +1,30 @@
 ﻿using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
 public class EnemiesGen : MonoBehaviour {
 
     public GameObject Player, EnemyBounce;
     public AnimationClip anim;
+    bool run;
   
     public List<Object> enemy = new List<Object>();
 
-	// Use this for initialization
-	void Start () {
-	    //anim.GetComponent<AnimationClip>();
-	}
 	
 	// Update is called once per frame
-	void Update () {
-        if (Player.transform.position.y > 2)
-        {
-            Generate();
-            this.transform.Translate(0.0f, Random.Range(4.0f, 9.0f), 0.0f);
-        }
+	void Start() {
+
+            StartCoroutine(Generate());
+
     }
 
-    void Generate()
+    public IEnumerator Generate()
     {
-        enemy.Add(Instantiate(EnemyBounce, new Vector2(this.transform.position.x, this.transform.position.y), this.transform.rotation));
+        while (true)
+        {
+            yield return new WaitForSeconds(Random.Range(1.0f, 1.5f));
+            enemy.Add(Instantiate(EnemyBounce, new Vector2(Random.Range(transform.position.x - 1.5f, transform.position.x + 1.5f), this.transform.position.y), this.transform.rotation));
+        }
     }
 }
 

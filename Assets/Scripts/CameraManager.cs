@@ -8,21 +8,13 @@ public class CameraManager : MonoBehaviour
     public GameObject player;
     public new Camera camera;
     public GameObject floor;
-    public List<Color> Colors = new List<Color>();
-    bool[] stages = new bool[3];
-    float timer;
 
-    void Start()
-    {
-        camera.backgroundColor = Colors[0];
-    }
 
     void Update()
     {
         this.camera.gameObject.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
         this.camera.nearClipPlane = -2f;
         CameraPositioning();
-        BackgroudColor();
     }
 
     //Used for poperly translate camera's position based on player's height
@@ -42,17 +34,4 @@ public class CameraManager : MonoBehaviour
             this.gameObject.transform.position = new Vector3(0.0f, 0.0f, -10.0f);
     }
 
-    //Changes background color dependent on player's position
-    void BackgroudColor()
-    {
-        if (player.transform.position.y <= 10)
-        {
-            camera.backgroundColor = Color.Lerp(Colors[0], Colors[1], 5);
-            stages[0] = true;
-        }
-        else if (player.transform.position.y >= 16 )
-        {
-            camera.backgroundColor = Color.Lerp(Colors[1], Colors[2], 5);
-        }
-    }
 }
