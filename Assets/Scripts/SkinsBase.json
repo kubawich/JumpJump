@@ -10,5 +10,17 @@
     {
         "id": 2,
         "name": "green"
+    },
+    {
+        "id": 3,
+        "name": "pink"
+    },
+    {
+        "id": 4,
+        "name": "NickCage"
+    },
+    {
+        "id": 5,
+        "name" : "BillGates"
     }
 ]
