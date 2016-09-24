@@ -7,7 +7,7 @@ using UnityEngine.Advertisements;
 public class PlayerManager : MonoBehaviour
 {
     //Actuall player dependent variables
-    public bool DiedByFall;
+    public bool DiedByFall, IsGameOver;
     new Rigidbody2D rigidbody;
     public float JumpHeight, currentY;
     public int Hits, CurrentPoints ,Points;
@@ -20,7 +20,7 @@ public class PlayerManager : MonoBehaviour
     public Image Logo;
     public Camera cam;
     public GameObject[] cloudstokill;
-    public GameObject CloudsGenerator;
+    public GameObject CloudsGenerator, GameOverScreen;
 
     //Initializes all variables
     void Awake()
@@ -49,14 +49,20 @@ public class PlayerManager : MonoBehaviour
     //Initialize after each another rebirth
     void NextPlay()
     {
-        cam.backgroundColor = Random.ColorHSV();
-        StartButton.gameObject.SetActive(true);
-        ShopButton.gameObject.SetActive(true);
-        Logo.gameObject.SetActive(true);
-        CurrentPoints = 0;
-        Hits = 0;
-        AllPoints.text = PlayerPrefs.GetInt("All points").ToString();
-        if(!StartButton.IsActive() || !ShopButton.IsActive()) this.gameObject.SetActive(true);
+        if (!IsGameOver)
+        {
+            GameOverScreen.SetActive(false);
+            cam.backgroundColor = Random.ColorHSV();
+            StartButton.gameObject.SetActive(true);
+            ShopButton.gameObject.SetActive(true);
+            Logo.gameObject.SetActive(true);
+            CurrentPoints = 0;
+            Hits = 0;
+            AllPoints.text = PlayerPrefs.GetInt("All points").ToString();
+            if (!StartButton.IsActive() || !ShopButton.IsActive()) this.gameObject.SetActive(true);
+
+        }
+
     }
 		
     void Update()
@@ -103,6 +109,7 @@ public class PlayerManager : MonoBehaviour
         if (Hits == 2 || this.gameObject.transform.position.y <= -4.5f || col.gameObject.tag == "Enemy")
         {
             //Gamepley stuff
+            IsGameOver = true;
             gameObject.transform.position = new Vector3(0.0f, -4.3f, 0.0f);
             cam.gameObject.transform.parent = null;
             cam.gameObject.SetActive(true);
@@ -114,6 +121,8 @@ public class PlayerManager : MonoBehaviour
             PlayerPrefs.SetInt("All points", Points);
             //UI stuff
             CurrentPointsText.canvasRenderer.gameObject.SetActive(false);
+            if(IsGameOver)
+                GameOverScreen.SetActive(true);
             NextPlay();
         }
     }
@@ -151,6 +160,7 @@ public class PlayerManager : MonoBehaviour
             yield return new WaitForSeconds(1.5f);
             CloudsDestroyer();
             Debug.Log("Died by fall");
+            IsGameOver = true;
             cam.gameObject.transform.parent = null;
             cam.transform.position = new Vector2(0f, 0f);
             this.gameObject.SetActive(false);
@@ -165,6 +175,7 @@ public class PlayerManager : MonoBehaviour
             if (range == 1)
                 ShowAd();
 
+            if(IsGameOver)GameOverScreen.SetActive(true);
             NextPlay();
         }
     }
