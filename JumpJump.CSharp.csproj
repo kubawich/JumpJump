@@ -81,6 +81,7 @@
     <Compile Include="Assets\Scripts\CameraManager.cs" />
     <Compile Include="Assets\Scripts\CloudGen.cs" />
     <Compile Include="Assets\Scripts\Destructor.cs" />
+    <Compile Include="Assets\Scripts\EndScreenPointsInfo.cs" />
     <Compile Include="Assets\Scripts\EnemiesGen.cs" />
     <Compile Include="Assets\Scripts\PlayerManager.cs" />
     <Compile Include="Assets\Scripts\PlayerStartPos.cs" />

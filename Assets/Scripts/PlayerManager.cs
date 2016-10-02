@@ -4,23 +4,24 @@ using System.Collections;
 using UnityEngine.UI;
 using UnityEngine.Advertisements;
 
+[System.Runtime.InteropServices.Guid("E6C25675-EE97-40FA-A46B-5353BC474A0C")]
 public class PlayerManager : MonoBehaviour
 {
     //Actuall player dependent variables
     public bool DiedByFall, IsGameOver;
     new Rigidbody2D rigidbody;
     public float JumpHeight, currentY;
-    public int Hits, CurrentPoints ,Points;
+    public int Hits, CurrentPoints, Points;
     //Variables for UI and other graphics magic
     public ParticleSystem PointsParticle;
     public Material particleMaterial = null;
     public Texture[] pointsParticleTexture = new Texture[10];
-    public Text CurrentPointsText , AllPoints;
+    public Text CurrentPointsText;
     public Button StartButton, ShopButton;
     public Image Logo;
     public Camera cam;
     public GameObject[] cloudstokill;
-    public GameObject CloudsGenerator, GameOverScreen;
+    public GameObject CloudsGenerator, GameOverScreen, StartUIHandler, ShopUIHandler;
 
     //Initializes all variables
     void Awake()
@@ -32,25 +33,24 @@ public class PlayerManager : MonoBehaviour
     void Start()
     {
         //General
+        IsGameOver = false;
         this.gameObject.SetActive(true);
         DiedByFall = false;
         //Graphics stuff
         QualitySettings.vSyncCount = 0;
         //Saving stuff
-        AllPoints.text = PlayerPrefs.GetInt("All points").ToString();
         rigidbody = this.GetComponent<Rigidbody2D>();
         CurrentPoints = 0;
         Hits = 0;
         //UI stuff
-        StartButton.gameObject.SetActive(false);
-        ShopButton.gameObject.SetActive(false);
+        StartUIHandler.transform.position = new Vector2(8, 0);
+        ShopUIHandler.transform.position = new Vector2(8, 0);
     }
 
     //Initialize after each another rebirth
-    void NextPlay()
-    {
-        if (!IsGameOver)
-        {
+    public void NextPlay()
+    { 
+           IsGameOver = false;
             GameOverScreen.SetActive(false);
             cam.backgroundColor = Random.ColorHSV();
             StartButton.gameObject.SetActive(true);
@@ -58,13 +58,9 @@ public class PlayerManager : MonoBehaviour
             Logo.gameObject.SetActive(true);
             CurrentPoints = 0;
             Hits = 0;
-            AllPoints.text = PlayerPrefs.GetInt("All points").ToString();
             if (!StartButton.IsActive() || !ShopButton.IsActive()) this.gameObject.SetActive(true);
-
-        }
-
     }
-		
+
     void Update()
     {
         Jump();
@@ -73,7 +69,7 @@ public class PlayerManager : MonoBehaviour
     }
 
     //Jump logic
-    public void Jump()
+    public bool Jump()
     {
         //Jump logic for touch input
         for (var i = 0; i < Input.touchCount; ++i)
@@ -84,16 +80,19 @@ public class PlayerManager : MonoBehaviour
                 CurrentPoints++;
                 EmitParticle();
                 currentY = this.transform.position.y;
+                return true;
             }
         }
         //Jump logic for keyboard input || Only for dev tests
         if (Input.GetButtonDown("Jump"))
-        {              
+        {
             rigidbody.velocity = new Vector2(0, JumpHeight);
             CurrentPoints++;
             EmitParticle();
             currentY = this.transform.position.y;
+            return true;
         }
+        return false;
     }
 
     //Used for killing player, and sum current game points to all points
@@ -115,15 +114,15 @@ public class PlayerManager : MonoBehaviour
             cam.gameObject.SetActive(true);
             gameObject.SetActive(false);
             cam.transform.position = new Vector2(0f, 0f);
+            Hits = 0;
             CloudsDestroyer();
             //Saving stuff
             Points = CurrentPoints + PlayerPrefs.GetInt("All points");
             PlayerPrefs.SetInt("All points", Points);
             //UI stuff
             CurrentPointsText.canvasRenderer.gameObject.SetActive(false);
-            if(IsGameOver)
+            if (IsGameOver)
                 GameOverScreen.SetActive(true);
-            NextPlay();
         }
     }
 
@@ -136,7 +135,7 @@ public class PlayerManager : MonoBehaviour
     //Ads manager
     void ShowAd()
     {
-        if (Advertisement.IsReady() )
+        if (Advertisement.IsReady())
         {
             Advertisement.Show();
         }
@@ -150,13 +149,15 @@ public class PlayerManager : MonoBehaviour
         {
             Debug.Log("falling");
             return true;
-        } else return false;
+        }
+        else return false;
     }
 
     //Implements death after falling for too long
     public IEnumerator DeadByFall()
     {
-        if (IsFalling()) {
+        if (IsFalling() && !Jump())
+        {
             yield return new WaitForSeconds(1.5f);
             CloudsDestroyer();
             Debug.Log("Died by fall");
@@ -164,19 +165,18 @@ public class PlayerManager : MonoBehaviour
             cam.gameObject.transform.parent = null;
             cam.transform.position = new Vector2(0f, 0f);
             this.gameObject.SetActive(false);
-            gameObject.transform.position = new Vector3(0.0f,-4.3f,0.0f);
+            gameObject.transform.position = new Vector3(0.0f, -4.3f, 0.0f);
             CloudsGenerator.transform.position = new Vector2(0f, 2f);
             Points = CurrentPoints + PlayerPrefs.GetInt("All points");
             PlayerPrefs.SetInt("All points", Points);
+            Hits = 0;
             DiedByFall = true;
 
             int range = Random.Range(0, 2);
-            Debug.Log(range);
             if (range == 1)
                 ShowAd();
 
-            if(IsGameOver)GameOverScreen.SetActive(true);
-            NextPlay();
+            if (IsGameOver) GameOverScreen.SetActive(true);
         }
     }
 
@@ -184,10 +184,16 @@ public class PlayerManager : MonoBehaviour
     public void CloudsDestroyer()
     {
         cloudstokill = GameObject.FindGameObjectsWithTag("Cloud");
-        for(int i=0; i< cloudstokill.Length; i++)
+        for (int i = 0; i < cloudstokill.Length; i++)
         {
             Destroy(cloudstokill[i]);
         }
         CloudsGenerator.transform.position = new Vector3(0.0f, 1.0f);
+    }
+
+    public void SetStartUI(int x)
+    {
+        StartUIHandler.transform.position = new Vector2(x, 0);
+        ShopUIHandler.transform.position = new Vector2(x, 0);
     }
 }
