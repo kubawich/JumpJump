@@ -10,7 +10,6 @@ public class SkinsManager : MonoBehaviour {
 
     void Awake()
     {
-        this.GetComponentInChildren<Text>().text ="You have " + PlayerPrefs.GetInt("All points").ToString() + " coins";
         instance = this;
         if (PlayerPrefs.HasKey("CurrentSkin"))
         {
