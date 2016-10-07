@@ -38,6 +38,8 @@ public class SkinsLogic : MonoBehaviour {
             y = 0.0f;
 
         PlayerMat.SetTextureOffset("_MainTex", new Vector2(x,y));
+        SkinsManager.Instance.CurrentSkinIndex = index;
+        SkinsManager.Instance.Save();
     }
 	
 }

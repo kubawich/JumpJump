@@ -11,7 +11,7 @@ public class PlayerManager : MonoBehaviour
     public bool DiedByFall, IsGameOver;
     new Rigidbody2D rigidbody;
     public float JumpHeight, currentY;
-    public int Hits, CurrentPoints, Points;
+    public int Hits, CurrentPoints, Points, PointsForGameOverScreen;
     //Variables for UI and other graphics magic
     public ParticleSystem PointsParticle;
     public Material particleMaterial = null;
@@ -20,8 +20,9 @@ public class PlayerManager : MonoBehaviour
     public Button StartButton, ShopButton;
     public Image Logo;
     public Camera cam;
-    public GameObject[] cloudstokill;
-    public GameObject CloudsGenerator, GameOverScreen, StartUIHandler, ShopUIHandler;
+    public GameObject[] cloudstokill, enemiestokill;
+    public GameObject CloudsGenerator, EnemiesGenerator, GameOverScreen, StartUIHandler, ShopUIHandler;
+    public EnemiesGen enemies;
 
     //Initializes all variables
     void Awake()
@@ -40,8 +41,8 @@ public class PlayerManager : MonoBehaviour
         QualitySettings.vSyncCount = 0;
         //Saving stuff
         rigidbody = this.GetComponent<Rigidbody2D>();
-        CurrentPoints = 0;
         Hits = 0;
+        enemies.StartCoroutine(enemies.Generate());
         //UI stuff
         StartUIHandler.transform.position = new Vector2(8, 0);
         ShopUIHandler.transform.position = new Vector2(8, 0);
@@ -49,16 +50,16 @@ public class PlayerManager : MonoBehaviour
 
     //Initialize after each another rebirth
     public void NextPlay()
-    { 
-           IsGameOver = false;
-            GameOverScreen.SetActive(false);
-            cam.backgroundColor = Random.ColorHSV();
-            StartButton.gameObject.SetActive(true);
-            ShopButton.gameObject.SetActive(true);
-            Logo.gameObject.SetActive(true);
-            CurrentPoints = 0;
-            Hits = 0;
-            if (!StartButton.IsActive() || !ShopButton.IsActive()) this.gameObject.SetActive(true);
+    {
+        IsGameOver = false;
+        GameOverScreen.SetActive(false);
+        cam.backgroundColor = Random.ColorHSV();
+        StartButton.gameObject.SetActive(true);
+        ShopButton.gameObject.SetActive(true);
+        Logo.gameObject.SetActive(true);
+        Hits = 0;
+        enemies.StartCoroutine(enemies.Generate());
+        if (!StartButton.IsActive() || !ShopButton.IsActive()) this.gameObject.SetActive(true);
     }
 
     void Update()
@@ -109,16 +110,21 @@ public class PlayerManager : MonoBehaviour
         {
             //Gamepley stuff
             IsGameOver = true;
+            PointsForGameOverScreen = CurrentPoints;
             gameObject.transform.position = new Vector3(0.0f, -4.3f, 0.0f);
             cam.gameObject.transform.parent = null;
             cam.gameObject.SetActive(true);
             gameObject.SetActive(false);
+            CloudsGenerator.transform.position = new Vector2(0f, 2f);
+            EnemiesGenerator.transform.position = new Vector2(0f, 2f);
             cam.transform.position = new Vector2(0f, 0f);
             Hits = 0;
             CloudsDestroyer();
+            EnemiesDestroyer();
             //Saving stuff
             Points = CurrentPoints + PlayerPrefs.GetInt("All points");
             PlayerPrefs.SetInt("All points", Points);
+            CurrentPoints = 0;
             //UI stuff
             CurrentPointsText.canvasRenderer.gameObject.SetActive(false);
             if (IsGameOver)
@@ -160,15 +166,19 @@ public class PlayerManager : MonoBehaviour
         {
             yield return new WaitForSeconds(1.5f);
             CloudsDestroyer();
-            Debug.Log("Died by fall");
+            EnemiesDestroyer();
             IsGameOver = true;
+            PointsForGameOverScreen = CurrentPoints;
             cam.gameObject.transform.parent = null;
             cam.transform.position = new Vector2(0f, 0f);
             this.gameObject.SetActive(false);
             gameObject.transform.position = new Vector3(0.0f, -4.3f, 0.0f);
+            CurrentPointsText.canvasRenderer.gameObject.SetActive(false);
             CloudsGenerator.transform.position = new Vector2(0f, 2f);
+            EnemiesGenerator.transform.position = new Vector2(0f, 2f);
             Points = CurrentPoints + PlayerPrefs.GetInt("All points");
             PlayerPrefs.SetInt("All points", Points);
+            CurrentPoints = 0;
             Hits = 0;
             DiedByFall = true;
 
@@ -189,6 +199,16 @@ public class PlayerManager : MonoBehaviour
             Destroy(cloudstokill[i]);
         }
         CloudsGenerator.transform.position = new Vector3(0.0f, 1.0f);
+    }
+
+    public void EnemiesDestroyer()
+    {
+        enemiestokill = GameObject.FindGameObjectsWithTag("Enemy");
+        for (int i = 0; i < enemiestokill.Length; i++)
+        {
+            Destroy(enemiestokill[i]);
+        }
+        EnemiesGenerator.transform.position = new Vector3(0.0f, 1.0f);
     }
 
     public void SetStartUI(int x)

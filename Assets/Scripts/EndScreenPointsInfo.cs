@@ -9,7 +9,7 @@ public class EndScreenPointsInfo : MonoBehaviour {
 
 	// Use this for initialization
 	void Update () {
-        EarnedPoints.text = "Earned points : " + player.CurrentPointsText.text.ToString();
+        EarnedPoints.text = "Earned points : " + player.PointsForGameOverScreen.ToString();
         AllPoints.text = "All points : " + PlayerPrefs.GetInt("All points");
 
     }

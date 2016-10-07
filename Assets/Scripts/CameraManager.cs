@@ -1,6 +1,5 @@
 ﻿//Controlls camera position relatively to player
 using UnityEngine;
-using System.Collections.Generic;
 
 public class CameraManager : MonoBehaviour
 {

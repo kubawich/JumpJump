@@ -83,6 +83,7 @@
     <Compile Include="Assets\Scripts\PlayerManager.cs" />
     <Compile Include="Assets\Scripts\PlayerStartPos.cs" />
     <Compile Include="Assets\Scripts\SkinsLogic.cs" />
+    <Compile Include="Assets\Scripts\SkinsManager.cs" />
     <Compile Include="Assets\Scripts\UI.cs" />
     <Compile Include="Assets\Scripts\scaler.cs" />
   </ItemGroup>
