@@ -7,11 +7,18 @@ public class SkinsLogic : MonoBehaviour {
     public GameObject SkinButton;
     public Text shoppointstext;
     public Material PlayerMat;
+    public PlayerManager pm;
 
-	void Start () {
-        shoppointstext.text = "You have " + SkinsManager.Instance.points.ToString() + " coins";
+    private void Update()
+    {
+        shoppointstext.text = "You have " + SkinsManager.Instance.points + " coins";
+    }
+
+    //Initializing skin shop thumbnails
+    void Start () {
         int texIndex = 0;
-	    foreach(Sprite texture in Textures)
+        shoppointstext.text = "You have " + SkinsManager.Instance.points + " coins";
+        foreach (Sprite texture in Textures)
         {
             GameObject container = Instantiate(SkinButton) as GameObject;
             container.GetComponent<Image>().sprite = texture;
@@ -26,6 +33,7 @@ public class SkinsLogic : MonoBehaviour {
             texIndex++;
         }
 	}
+
 
     void ChangeSkin(int index)
     {
@@ -49,7 +57,7 @@ public class SkinsLogic : MonoBehaviour {
         }
         else
         {
-            //Buyin mechanic
+            //Buying mechanic
             int cost = 10000;
 
             if(SkinsManager.Instance.points >= cost)
@@ -57,8 +65,10 @@ public class SkinsLogic : MonoBehaviour {
                 SkinsManager.Instance.points -= cost;
                 SkinsManager.Instance.SkinAvailability += 1 << index;
                 SkinsManager.Instance.Save();
+                Debug.Log(PlayerPrefs.GetInt("All points"));
+                Debug.Log(SkinsManager.Instance.points);
                 this.gameObject.transform.GetChild(index).GetChild(0).gameObject.SetActive(false);
-                shoppointstext.text = "You have " + SkinsManager.Instance.points.ToString() + " coins";
+                shoppointstext.text = "You have " + SkinsManager.Instance.points + " coins";
                 ChangeSkin(index);
             }
         }

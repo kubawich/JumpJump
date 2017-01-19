@@ -23,11 +23,13 @@ public class PlayerManager : MonoBehaviour
     public GameObject[] cloudstokill, enemiestokill;
     public GameObject CloudsGenerator, EnemiesGenerator, GameOverScreen, StartUIHandler, ShopUIHandler;
     public EnemiesGen enemies;
+    public SkinsManager sm;
 
     //Initializes all variables
     void Awake()
     {
         gameObject.SetActive(false);
+        Points = PlayerPrefs.GetInt("All points");
     }
 
     //Initialize after first rebirth
@@ -42,10 +44,12 @@ public class PlayerManager : MonoBehaviour
         //Saving stuff
         rigidbody = this.GetComponent<Rigidbody2D>();
         Hits = 0;
-        enemies.StartCoroutine(enemies.Generate());
+        StartDemandingCroutines();
         //UI stuff
         StartUIHandler.transform.position = new Vector2(8, 0);
         ShopUIHandler.transform.position = new Vector2(8, 0);
+        if (!PlayerPrefs.HasKey("All points"))
+            PlayerPrefs.SetInt("All points", 0);
     }
 
     //Initialize after each another rebirth
@@ -115,6 +119,7 @@ public class PlayerManager : MonoBehaviour
             cam.gameObject.transform.parent = null;
             cam.gameObject.SetActive(true);
             gameObject.SetActive(false);
+            enemies.StopAllCoroutines();
             CloudsGenerator.transform.position = new Vector2(0f, 2f);
             EnemiesGenerator.transform.position = new Vector2(0f, 2f);
             cam.transform.position = new Vector2(0f, 0f);
@@ -122,8 +127,11 @@ public class PlayerManager : MonoBehaviour
             CloudsDestroyer();
             EnemiesDestroyer();
             //Saving stuff
-            Points = CurrentPoints + PlayerPrefs.GetInt("All points");
+            if (PlayerPrefs.HasKey("All points"))
+                Points = CurrentPoints + PlayerPrefs.GetInt("All points");
+            else Debug.Log("error, no key");
             PlayerPrefs.SetInt("All points", Points);
+            sm.points = Points;
             CurrentPoints = 0;
             //UI stuff
             CurrentPointsText.canvasRenderer.gameObject.SetActive(false);
@@ -144,6 +152,7 @@ public class PlayerManager : MonoBehaviour
         if (Advertisement.IsReady())
         {
             Advertisement.Show();
+            Debug.Log("Ad's playin'");
         }
         else Start();
     }
@@ -173,11 +182,15 @@ public class PlayerManager : MonoBehaviour
             cam.transform.position = new Vector2(0f, 0f);
             this.gameObject.SetActive(false);
             gameObject.transform.position = new Vector3(0.0f, -4.3f, 0.0f);
+            enemies.StopAllCoroutines();
             CurrentPointsText.canvasRenderer.gameObject.SetActive(false);
             CloudsGenerator.transform.position = new Vector2(0f, 2f);
             EnemiesGenerator.transform.position = new Vector2(0f, 2f);
-            Points = CurrentPoints + PlayerPrefs.GetInt("All points");
+            if (PlayerPrefs.HasKey("All points"))
+                Points = CurrentPoints + PlayerPrefs.GetInt("All points");
+            else Debug.Log("Error, no key");
             PlayerPrefs.SetInt("All points", Points);
+            sm.points = Points;
             CurrentPoints = 0;
             Hits = 0;
             DiedByFall = true;
@@ -215,5 +228,10 @@ public class PlayerManager : MonoBehaviour
     {
         StartUIHandler.transform.position = new Vector2(x, 0);
         ShopUIHandler.transform.position = new Vector2(x, 0);
+    }
+
+    public void StartDemandingCroutines()
+    {
+        enemies.StartCoroutine(enemies.Generate());
     }
 }

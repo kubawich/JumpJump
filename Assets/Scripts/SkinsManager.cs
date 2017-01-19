@@ -1,15 +1,16 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 
 public class SkinsManager : MonoBehaviour {
 
     private static SkinsManager instance;
     public static SkinsManager Instance { get { return instance; } }
 
-    public int points, SkinAvailability, CurrentSkinIndex;
+    public int points, CurrentSkinIndex = 0;
+    public int SkinAvailability = 1;
 
-    void Awake()
+    void Start()
     {
+        Object.DontDestroyOnLoad(gameObject);
         instance = this;
         if (PlayerPrefs.HasKey("CurrentSkin"))
         {
@@ -19,15 +20,15 @@ public class SkinsManager : MonoBehaviour {
         }
         else
         {
-            PlayerPrefs.SetInt("CurrentSkin", 0);
-            PlayerPrefs.SetInt("SkinAvailability", 1);
+            Save();
         }
     }
 
     public void Save()
     {
-        PlayerPrefs.SetInt("CurrentSkin", 0);
-        PlayerPrefs.SetInt("SkinAvailability", 1);
+        PlayerPrefs.SetInt("CurrentSkin", CurrentSkinIndex);
+        PlayerPrefs.SetInt("SkinAvailability", SkinAvailability);
+        PlayerPrefs.SetInt("All points", points);
     }
 
 }
